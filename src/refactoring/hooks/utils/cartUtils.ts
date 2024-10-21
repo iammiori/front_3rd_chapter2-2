@@ -78,10 +78,24 @@ export const calculateCartTotal = (
 
   return total;
 };
+
+const updateItemQuantity = (item: CartItem, newQuantity: number) => ({
+  ...item,
+  quantity: Math.min(newQuantity, item.product.stock)
+});
+
 export const updateCartItemQuantity = (
   cart: CartItem[],
   productId: string,
   newQuantity: number
 ): CartItem[] => {
-  return [];
+  const shouldRemove = newQuantity === 0;
+  const updateItem = (item: CartItem) =>
+    item.product.id === productId
+      ? updateItemQuantity(item, newQuantity)
+      : item;
+
+  return shouldRemove
+    ? cart.filter((item) => item.product.id !== productId)
+    : cart.map(updateItem);
 };
