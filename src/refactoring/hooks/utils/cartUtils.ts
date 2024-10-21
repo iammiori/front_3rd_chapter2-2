@@ -17,7 +17,10 @@ export const getMaxApplicableDiscount = (item: CartItem) => {
     return 0;
   }
 
-  return discounts.reduce((maxRate, { rate }) => Math.max(maxRate, rate), 0);
+  return applicableDiscounts.reduce(
+    (maxRate, { rate }) => Math.max(maxRate, rate),
+    0
+  );
 };
 
 const applyDiscount = (price: number, discountRate: number) => {
@@ -30,17 +33,51 @@ export const calculateItemTotal = (item: CartItem) => {
   return applyDiscount(product.price * quantity, discountRate);
 };
 
-export const calculateCartTotal = (
-  cart: CartItem[],
-  selectedCoupon: Coupon | null
-) => {
-  return {
-    totalBeforeDiscount: 0,
-    totalAfterDiscount: 0,
-    totalDiscount: 0
-  };
+const applyCouponDiscount = (total: number, coupon: Coupon) => {
+  const { discountType } = coupon;
+  switch (discountType) {
+    case 'amount':
+      return total - coupon.discountValue;
+    case 'percentage':
+      return applyDiscount(total, coupon.discountValue / 100);
+    default:
+      return total;
+  }
 };
 
+const calculateCartTotalWithoutCoupon = (carts: CartItem[]) => {
+  return carts.reduce(
+    (total, item) => {
+      const itemTotal = calculateItemTotal(item);
+      total.totalBeforeDiscount += item.product.price * item.quantity;
+      total.totalAfterDiscount += itemTotal;
+      total.totalDiscount =
+        total.totalBeforeDiscount - total.totalAfterDiscount;
+      return total;
+    },
+    { totalBeforeDiscount: 0, totalAfterDiscount: 0, totalDiscount: 0 }
+  );
+};
+
+export const calculateCartTotal = (
+  carts: CartItem[],
+  selectedCoupon: Coupon | null
+) => {
+  const total = calculateCartTotalWithoutCoupon(carts);
+
+  if (!selectedCoupon) {
+    return total;
+  }
+
+  const discountedTotal = applyCouponDiscount(
+    total.totalAfterDiscount,
+    selectedCoupon
+  );
+  total.totalDiscount = total.totalBeforeDiscount - discountedTotal;
+  total.totalAfterDiscount = discountedTotal;
+
+  return total;
+};
 export const updateCartItemQuantity = (
   cart: CartItem[],
   productId: string,
