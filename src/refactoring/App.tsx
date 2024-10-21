@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CartPage } from './components/CartPage.tsx';
 import { AdminPage } from './components/AdminPage.tsx';
 import { Coupon, Product } from '../types.ts';
-import { useCoupons, useProducts } from "./hooks";
+import { useCoupons, useProducts } from './hooks';
 
 const initialProducts: Product[] = [
   {
@@ -10,7 +10,10 @@ const initialProducts: Product[] = [
     name: '상품1',
     price: 10000,
     stock: 20,
-    discounts: [{ quantity: 10, rate: 0.1 }, { quantity: 20, rate: 0.2 }]
+    discounts: [
+      { quantity: 10, rate: 0.1 },
+      { quantity: 20, rate: 0.2 }
+    ]
   },
   {
     id: 'p2',
@@ -71,7 +74,7 @@ const App = () => {
             onCouponAdd={addCoupon}
           />
         ) : (
-          <CartPage products={products} coupons={coupons}/>
+          <CartPage products={products} coupons={coupons} />
         )}
       </main>
     </div>
