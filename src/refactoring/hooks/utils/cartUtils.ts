@@ -10,7 +10,7 @@ export const getMaxApplicableDiscount = (item: CartItem) => {
   }
 
   const applicableDiscounts = discounts.filter(
-    (discount) => discount.quantity === quantity
+    (discount) => discount.quantity <= quantity
   );
 
   if (applicableDiscounts.length === 0) {
