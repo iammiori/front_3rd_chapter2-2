@@ -1,101 +1,94 @@
 import { CartItem, Coupon } from '../../../types';
 
+type CartTotal = {
+  totalBeforeDiscount: number;
+  totalAfterDiscount: number;
+  totalDiscount: number;
+};
+
 export const getMaxApplicableDiscount = (item: CartItem) => {
-  const {
-    product: { discounts },
-    quantity
-  } = item;
-  if (discounts.length === 0) {
-    return 0;
-  }
-
-  const applicableDiscounts = discounts.filter(
-    (discount) => discount.quantity <= quantity
-  );
-
-  if (applicableDiscounts.length === 0) {
-    return 0;
-  }
-
-  return applicableDiscounts.reduce(
-    (maxRate, { rate }) => Math.max(maxRate, rate),
-    0
-  );
+  const { discounts } = item.product;
+  return discounts.length === 0
+    ? 0
+    : Math.max(
+        ...discounts
+          .filter((discount) => discount.quantity <= item.quantity)
+          .map((discount) => discount.rate),
+        0
+      );
 };
 
-const applyDiscount = (price: number, discountRate: number) => {
-  return price * (1 - discountRate);
-};
+const calculateDiscountedPrice = (price: number, discountRate: number) =>
+  price * (1 - discountRate);
 
 export const calculateItemTotal = (item: CartItem) => {
-  const { product, quantity } = item;
+  const basePrice = item.product.price * item.quantity;
   const discountRate = getMaxApplicableDiscount(item);
-  return applyDiscount(product.price * quantity, discountRate);
+  return calculateDiscountedPrice(basePrice, discountRate);
 };
 
-const applyCouponDiscount = (total: number, coupon: Coupon) => {
-  const { discountType } = coupon;
-  switch (discountType) {
-    case 'amount':
-      return total - coupon.discountValue;
-    case 'percentage':
-      return applyDiscount(total, coupon.discountValue / 100);
-    default:
-      return total;
-  }
-};
-
-const calculateCartTotalWithoutCoupon = (carts: CartItem[]) => {
-  return carts.reduce(
-    (total, item) => {
-      const itemTotal = calculateItemTotal(item);
-      total.totalBeforeDiscount += item.product.price * item.quantity;
-      total.totalAfterDiscount += itemTotal;
-      total.totalDiscount =
-        total.totalBeforeDiscount - total.totalAfterDiscount;
-      return total;
-    },
-    { totalBeforeDiscount: 0, totalAfterDiscount: 0, totalDiscount: 0 }
-  );
-};
-
-export const calculateCartTotal = (
-  carts: CartItem[],
-  selectedCoupon: Coupon | null
-) => {
-  const total = calculateCartTotalWithoutCoupon(carts);
-
-  if (!selectedCoupon) {
+const calculateCouponDiscount = (total: number, coupon: Coupon) => {
+  if (!coupon) {
     return total;
   }
 
-  const discountedTotal = applyCouponDiscount(
-    total.totalAfterDiscount,
-    selectedCoupon
-  );
-  total.totalDiscount = total.totalBeforeDiscount - discountedTotal;
-  total.totalAfterDiscount = discountedTotal;
-
-  return total;
+  return coupon.discountType === 'amount'
+    ? total - coupon.discountValue
+    : calculateDiscountedPrice(total, coupon.discountValue / 100);
 };
 
-const updateItemQuantity = (item: CartItem, newQuantity: number) => ({
-  ...item,
-  quantity: Math.min(newQuantity, item.product.stock)
-});
+const calculateBaseCartTotal = (items: CartItem[]) => {
+  const totalBeforeDiscount = items.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
+    0
+  );
+
+  const totalAfterDiscount = items.reduce(
+    (sum, item) => sum + calculateItemTotal(item),
+    0
+  );
+
+  return {
+    totalBeforeDiscount,
+    totalAfterDiscount,
+    totalDiscount: totalBeforeDiscount - totalAfterDiscount
+  } as CartTotal;
+};
+
+export const calculateCartTotal = (
+  items: CartItem[],
+  selectedCoupon: Coupon | null
+) => {
+  const baseTotal = calculateBaseCartTotal(items);
+
+  if (!selectedCoupon) {
+    return baseTotal;
+  }
+
+  const finalTotal = calculateCouponDiscount(
+    baseTotal.totalAfterDiscount,
+    selectedCoupon
+  );
+
+  return {
+    ...baseTotal,
+    totalAfterDiscount: finalTotal,
+    totalDiscount: baseTotal.totalBeforeDiscount - finalTotal
+  } as CartTotal;
+};
 
 export const updateCartItemQuantity = (
-  cart: CartItem[],
+  items: CartItem[],
   productId: string,
   newQuantity: number
-): CartItem[] => {
-  const shouldRemove = newQuantity === 0;
-  const updateItem = (item: CartItem) =>
-    item.product.id === productId
-      ? updateItemQuantity(item, newQuantity)
-      : item;
+) => {
+  if (newQuantity === 0) {
+    return items.filter((item) => item.product.id !== productId);
+  }
 
-  return shouldRemove
-    ? cart.filter((item) => item.product.id !== productId)
-    : cart.map(updateItem);
+  return items.map((item) =>
+    item.product.id === productId
+      ? { ...item, quantity: Math.min(newQuantity, item.product.stock) }
+      : item
+  );
 };
