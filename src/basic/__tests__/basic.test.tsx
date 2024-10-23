@@ -11,7 +11,7 @@ import { describe, expect, test } from 'vitest';
 import { AdminPage } from '../../refactoring/components/AdminPage';
 import { CartPage } from '../../refactoring/components/CartPage';
 import { useCart, useCoupons, useProducts } from '../../refactoring/hooks';
-import * as cartUtils from '../../refactoring/hooks/utils/cartUtils';
+import * as cartUtils from '../../refactoring/utils/cart';
 import { CartItem, Coupon, Product } from '../../types';
 
 const mockProducts: Product[] = [

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CartItem, Coupon, Product } from '../../types';
-import { calculateCartTotal, updateCartItemQuantity } from './utils/cartUtils';
+import { calculateCartTotal, updateCartItemQuantity } from '../utils/cart';
 
 type CartItems = CartItem[];
 type CouponState = Coupon | null;

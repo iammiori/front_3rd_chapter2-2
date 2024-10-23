@@ -1,4 +1,4 @@
-import { CartItem, Coupon } from '../../../types';
+import { CartItem, Coupon } from '../../types';
 
 type CartTotal = {
   totalBeforeDiscount: number;
