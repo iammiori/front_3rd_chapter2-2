@@ -1,8 +1,16 @@
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  within
+} from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, test } from 'vitest';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import { CartPage } from '../../refactoring/components/CartPage';
 import { AdminPage } from '../../refactoring/components/AdminPage';
+import { CartPage } from '../../refactoring/components/CartPage';
+import { useProductForm } from '../../refactoring/hooks/useProductForm.admin';
 import { Coupon, Product } from '../../types';
 
 const mockProducts: Product[] = [
@@ -259,15 +267,61 @@ describe('advanced > ', () => {
 
       expect($newCoupon).toHaveTextContent('새 쿠폰 (NEW10):10% 할인');
     });
-  });
 
-  describe('자유롭게 작성해보세요.', () => {
-    test('새로운 유틸 함수를 만든 후에 테스트 코드를 작성해서 실행해보세요', () => {
-      expect(true).toBe(false);
-    });
+    describe('useProductForm: 새로운 상품 추가 폼', () => {
+      test('초기값이 없으면 기본값으로 초기화되어야 한다', () => {
+        const { result } = renderHook(() => useProductForm());
 
-    test('새로운 hook 함수르 만든 후에 테스트 코드를 작성해서 실행해보세요', () => {
-      expect(true).toBe(false);
+        expect(result.current.newProduct).toEqual({
+          id: 'default-new',
+          name: '',
+          price: 0,
+          stock: 0,
+          discounts: []
+        });
+      });
+
+      test('필드를 올바르게 업데이트해야 한다', () => {
+        const selectedProduct: Product = {
+          id: 'default-new',
+          name: '',
+          price: 0,
+          stock: 0,
+          discounts: []
+        };
+        const { result } = renderHook(() => useProductForm());
+
+        act(() => {
+          result.current.updateNewProduct('name', 'Product 2');
+        });
+
+        expect(result.current.newProduct).toEqual({
+          ...selectedProduct,
+          name: 'Product 2'
+        });
+      });
+
+      test('폼을 기본값으로 리셋해야 한다', () => {
+        const { result } = renderHook(() => useProductForm());
+
+        act(() => {
+          result.current.updateNewProduct('name', 'Product 2');
+        });
+
+        expect(result.current.newProduct.name).toBe('Product 2');
+
+        act(() => {
+          result.current.resetNewProductForm();
+        });
+
+        expect(result.current.newProduct).toEqual({
+          id: 'default-new',
+          name: '',
+          price: 0,
+          stock: 0,
+          discounts: []
+        });
+      });
     });
   });
 });
