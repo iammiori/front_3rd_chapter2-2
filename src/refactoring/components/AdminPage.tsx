@@ -5,6 +5,7 @@ import { useProductForm } from '../hooks/useProductForm.admin.ts';
 import { useProduct } from '../hooks/userProduct.admin.ts';
 import { AdminLayout } from '../layout/index.tsx';
 import { formatCurrency } from '../utils/price.ts';
+import { ProductForm } from './ProductForm.tsx';
 
 interface Props {
   products: Product[];
@@ -67,15 +68,12 @@ export const AdminPage = ({
             {showNewProductForm ? '취소' : '새 상품 추가'}
           </button>
           {showNewProductForm && (
-            <div className="bg-white p-4 rounded shadow mb-4">
-              <h3 className="text-xl font-semibold mb-2">새 상품 추가</h3>
-              <div className="mb-2">
-                <label
-                  htmlFor="productName"
-                  className="block text-sm font-medium text-gray-700"
-                >
+            <ProductForm>
+              <ProductForm.Field>
+                <ProductForm.Label htmlFor="productName">
                   상품명
-                </label>
+                </ProductForm.Label>
+
                 <input
                   id="productName"
                   type="text"
@@ -83,14 +81,13 @@ export const AdminPage = ({
                   onChange={(e) => updateNewProduct('name', e.target.value)}
                   className="w-full p-2 border rounded"
                 />
-              </div>
-              <div className="mb-2">
-                <label
-                  htmlFor="productPrice"
-                  className="block text-sm font-medium text-gray-700"
-                >
+              </ProductForm.Field>
+
+              <ProductForm.Field>
+                <ProductForm.Label htmlFor="productPrice">
                   가격
-                </label>
+                </ProductForm.Label>
+
                 <input
                   id="productPrice"
                   type="number"
@@ -100,14 +97,13 @@ export const AdminPage = ({
                   }
                   className="w-full p-2 border rounded"
                 />
-              </div>
-              <div className="mb-2">
-                <label
-                  htmlFor="productStock"
-                  className="block text-sm font-medium text-gray-700"
-                >
+              </ProductForm.Field>
+
+              <ProductForm.Field>
+                <ProductForm.Label htmlFor="productStock">
                   재고
-                </label>
+                </ProductForm.Label>
+
                 <input
                   id="productStock"
                   type="number"
@@ -117,14 +113,15 @@ export const AdminPage = ({
                   }
                   className="w-full p-2 border rounded"
                 />
-              </div>
+              </ProductForm.Field>
+
               <button
                 onClick={handleAddNewProduct}
                 className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
               >
                 추가
               </button>
-            </div>
+            </ProductForm>
           )}
           <div className="space-y-2">
             {products.map((product, index) => (
