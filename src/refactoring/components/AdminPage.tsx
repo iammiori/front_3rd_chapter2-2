@@ -3,6 +3,7 @@ import { Coupon, Product } from '../../types.ts';
 import { useCoupon } from '../hooks/useCoupon.admin.ts';
 import { useProductForm } from '../hooks/useProductForm.admin.ts';
 import { useProduct } from '../hooks/userProduct.admin.ts';
+import { AdminLayout } from '../layout/index.tsx';
 import { formatCurrency } from '../utils/price.ts';
 
 interface Props {
@@ -52,9 +53,11 @@ export const AdminPage = ({
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">관리자 페이지</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <AdminLayout>
+      <AdminLayout.Header>
+        <AdminLayout.Title>관리자 페이지</AdminLayout.Title>
+      </AdminLayout.Header>
+      <AdminLayout.Content>
         <div>
           <h2 className="text-2xl font-semibold mb-4">상품 관리</h2>
           <button
@@ -338,7 +341,7 @@ export const AdminPage = ({
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </AdminLayout.Content>
+    </AdminLayout>
   );
 };
