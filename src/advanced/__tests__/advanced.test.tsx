@@ -540,6 +540,15 @@ describe('advanced > ', () => {
       });
     });
 
+    describe('순수함수 테스트 - util-할인율, %', () => {
+      test('할인율을 계산할 수 있다', () => {
+        expect(priceUtils.getDiscountRate(20)).toBe(0.2);
+      });
+      test('할인율을 %로 계산할 수 있다', () => {
+        expect(priceUtils.getPercentValue(0.2)).toBe(20);
+      });
+    });
+
     describe('순수함수 테스트 - lib-util-cn', () => {
       test('머지가 잘 된다', () => {
         const result = cn('bg-red-500', 'text-white', 'p-4');

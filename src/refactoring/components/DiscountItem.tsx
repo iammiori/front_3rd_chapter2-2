@@ -1,3 +1,5 @@
+import { getPercentValue } from '../utils/price';
+
 type Props = {
   quantity: number;
   rate: number;
@@ -14,7 +16,7 @@ export default function DiscountItem({
   return (
     <div className="flex justify-between items-center mb-2">
       <span>
-        {quantity}개 이상 구매 시 {rate * 100}% 할인
+        {quantity}개 이상 구매 시 {getPercentValue(rate)}% 할인
       </span>
       {showRemoveButton && onRemove && (
         <button

@@ -13,3 +13,7 @@ export const formatCurrency = (
   ).format(amount);
   return `${formattedAmount}${formattedCurrencySymbol}`;
 };
+
+export const getDiscountRate = (amount: number) => amount / 100;
+
+export const getPercentValue = (ratio: number) => ratio * 100;

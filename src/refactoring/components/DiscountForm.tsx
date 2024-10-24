@@ -1,4 +1,5 @@
 import { Discount } from '../../types';
+import { getDiscountRate, getPercentValue } from '../utils/price';
 
 type Props = {
   newDiscount: Discount;
@@ -28,11 +29,11 @@ export default function DiscountForm({
       <input
         type="number"
         placeholder="할인율 (%)"
-        value={newDiscount.rate * 100}
+        value={getPercentValue(newDiscount.rate)}
         onChange={(e) =>
           setNewDiscount({
             ...newDiscount,
-            rate: parseInt(e.target.value) / 100
+            rate: getDiscountRate(parseInt(e.target.value))
           })
         }
         className="w-1/3 p-2 border rounded"
