@@ -13,6 +13,7 @@ import { CartPage } from '../../refactoring/components/CartPage';
 import { useCoupon } from '../../refactoring/hooks/useCoupon.admin';
 import { useProductForm } from '../../refactoring/hooks/useProductForm.admin';
 import { useProduct } from '../../refactoring/hooks/userProduct.admin';
+import { cn } from '../../refactoring/libs/utils';
 import * as priceUtils from '../../refactoring/utils/price';
 import { Coupon, Product } from '../../types';
 
@@ -525,7 +526,7 @@ describe('advanced > ', () => {
       });
     });
 
-    describe('순수함수 테스트 - util', () => {
+    describe('순수함수 테스트 - util-formatCurrency', () => {
       const number = 123456;
       test('올바른 숫자 포맷과 currency를 표기할 수 있다 - 원화', () => {
         expect(priceUtils.formatCurrency(number, '원', 'ko-KR')).toBe(
@@ -536,6 +537,28 @@ describe('advanced > ', () => {
         expect(priceUtils.formatCurrency(number, undefined, 'en-IN')).toBe(
           '1,23,456'
         );
+      });
+    });
+
+    describe('순수함수 테스트 - lib-util-cn', () => {
+      test('머지가 잘 된다', () => {
+        const result = cn('bg-red-500', 'text-white', 'p-4');
+        expect(result).toBe('bg-red-500 text-white p-4');
+      });
+
+      test('falsy값을 필터링 한다', () => {
+        const result = cn('bg-red-500', undefined, 'text-white', null, 'p-4');
+        expect(result).toBe('bg-red-500 text-white p-4');
+      });
+
+      test('아무것도 입력안하면 빈값을 반환한다.', () => {
+        const result = cn();
+        expect(result).toBe('');
+      });
+
+      test('conflict이 나면, 후자가 머지가 잘 된다', () => {
+        const result = cn('bg-red-500', 'text-white', 'p-4', 'bg-blue-500');
+        expect(result).toBe('text-white p-4 bg-blue-500');
       });
     });
   });
