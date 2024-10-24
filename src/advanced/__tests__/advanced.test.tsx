@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 import { AdminPage } from '../../refactoring/components/AdminPage';
 import { CartPage } from '../../refactoring/components/CartPage';
+import { useCoupon } from '../../refactoring/hooks/useCoupon.admin';
 import { useProductForm } from '../../refactoring/hooks/useProductForm.admin';
 import { useProduct } from '../../refactoring/hooks/userProduct.admin';
 import { Coupon, Product } from '../../types';
@@ -467,6 +468,58 @@ describe('advanced > ', () => {
           price: 1000,
           stock: 100,
           discounts: [{ quantity: 10, rate: 20 }]
+        });
+      });
+    });
+
+    describe('useCoupon.admin 쿠폰 관리 - 어드민', () => {
+      test('기본 쿠폰 값으로 초기화 되어야 한다', () => {
+        const { result } = renderHook(() => useCoupon(() => {}));
+
+        expect(result.current.newCoupon).toEqual({
+          name: '',
+          code: '',
+          discountType: 'percentage',
+          discountValue: 0
+        });
+      });
+
+      test('쿠폰 필드가 업데이트 된다', () => {
+        const { result } = renderHook(() => useCoupon(() => {}));
+
+        act(() => {
+          result.current.updateField('name', '어머낫 이건 꼭 사야해');
+        });
+
+        expect(result.current.newCoupon.name).toBe('어머낫 이건 꼭 사야해');
+      });
+
+      test('handleAddCoupon은 onCouponAdd를 호출하고, 쿠폰을 초기화한다', () => {
+        const onCouponAdd = vi.fn();
+        const { result } = renderHook(() => useCoupon(onCouponAdd));
+
+        act(() => {
+          result.current.updateField('name', '어머낫 이건 꼭 사야해');
+          result.current.updateField('code', 'code-1');
+          result.current.updateField('discountValue', 20);
+        });
+
+        act(() => {
+          result.current.handleAddCoupon();
+        });
+
+        expect(onCouponAdd).toHaveBeenCalledWith({
+          name: '어머낫 이건 꼭 사야해',
+          code: 'code-1',
+          discountType: 'percentage',
+          discountValue: 20
+        });
+
+        expect(result.current.newCoupon).toEqual({
+          name: '',
+          code: '',
+          discountType: 'percentage',
+          discountValue: 0
         });
       });
     });
