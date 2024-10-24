@@ -3,6 +3,7 @@ import { Coupon, Product } from '../../types.ts';
 import { useCoupon } from '../hooks/useCoupon.admin.ts';
 import { useProductForm } from '../hooks/useProductForm.admin.ts';
 import { useProduct } from '../hooks/userProduct.admin.ts';
+import { formatCurrency } from '../utils/price.ts';
 
 interface Props {
   products: Product[];
@@ -134,7 +135,8 @@ export const AdminPage = ({
                   onClick={() => toggleProductAccordion(product.id)}
                   className="w-full text-left font-semibold"
                 >
-                  {product.name} - {product.price}원 (재고: {product.stock})
+                  {product.name} - {formatCurrency(product.price, '원')} (재고:{' '}
+                  {product.stock})
                 </button>
                 {openProductIds.has(product.id) && (
                   <div className="mt-2">
@@ -327,7 +329,7 @@ export const AdminPage = ({
                   >
                     {coupon.name} ({coupon.code}):
                     {coupon.discountType === 'amount'
-                      ? `${coupon.discountValue}원`
+                      ? formatCurrency(coupon.discountValue, '원')
                       : `${coupon.discountValue}%`}{' '}
                     할인
                   </div>

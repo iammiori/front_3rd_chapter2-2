@@ -13,6 +13,7 @@ import { CartPage } from '../../refactoring/components/CartPage';
 import { useCoupon } from '../../refactoring/hooks/useCoupon.admin';
 import { useProductForm } from '../../refactoring/hooks/useProductForm.admin';
 import { useProduct } from '../../refactoring/hooks/userProduct.admin';
+import * as priceUtils from '../../refactoring/utils/price';
 import { Coupon, Product } from '../../types';
 
 const mockProducts: Product[] = [
@@ -187,7 +188,7 @@ describe('advanced > ', () => {
       const $product4 = screen.getByTestId('product-4');
 
       expect($product4).toHaveTextContent('상품4');
-      expect($product4).toHaveTextContent('15000원');
+      expect($product4).toHaveTextContent('15,000원');
       expect($product4).toHaveTextContent('재고: 30');
 
       // 2. 상품 선택 및 수정
@@ -210,7 +211,7 @@ describe('advanced > ', () => {
       fireEvent.click(within($product1).getByText('수정 완료'));
 
       expect($product1).toHaveTextContent('수정된 상품1');
-      expect($product1).toHaveTextContent('12000원');
+      expect($product1).toHaveTextContent('12,000원');
       expect($product1).toHaveTextContent('재고: 25');
 
       // 3. 상품 할인율 추가 및 삭제
@@ -521,6 +522,20 @@ describe('advanced > ', () => {
           discountType: 'percentage',
           discountValue: 0
         });
+      });
+    });
+
+    describe('순수함수 테스트 - util', () => {
+      const number = 123456;
+      test('올바른 숫자 포맷과 currency를 표기할 수 있다 - 원화', () => {
+        expect(priceUtils.formatCurrency(number, '원', 'ko-KR')).toBe(
+          '123,456원'
+        );
+      });
+      test('올바른 숫자 포맷과 currency를 표기할 수 있다 - India', () => {
+        expect(priceUtils.formatCurrency(number, undefined, 'en-IN')).toBe(
+          '1,23,456'
+        );
       });
     });
   });
